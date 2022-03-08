@@ -3,7 +3,6 @@
 Padding Oracle Exploit API
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 '''
-from Crypto.Util.Padding import pad, unpad
 from itertools import cycle
 import logging
 
@@ -76,7 +75,9 @@ class PaddingOracle(object):
             or iv is None, the first *block_size* bytes will be null's.
         :returns: Encrypted data.
         '''
-        plaintext = bytearray(pad(plaintext, block_size))
+        plen = block_size - (len(plaintext) % block_size)
+        plaintext = plaintext + bytes([plen]) * plen
+        plaintext = bytearray(plaintext)
 
         self.log.debug(f'Attempting to encrypt {plaintext} bytes')
 
@@ -267,16 +268,9 @@ def xor(data, key):
 def test():
     import os
     from Crypto.Cipher import AES
-
-    # logging.basicConfig(level=logging.DEBUG)
+    from Crypto.Util.Padding import pad, unpad
 
     teststring = b'The quick brown fox jumped over the lazy dog'
-
-    def pkcs7_pad(data, blklen=16):
-        if blklen > 255:
-            raise ValueError(f'Illegal block size {blklen}')
-        ppad = (blklen - (len(data) % blklen))
-        return data + bytes([ppad]) * ppad
 
     class PadBuster(PaddingOracle):
         def oracle(self, data):
@@ -301,7 +295,7 @@ def test():
         print('Testing padding oracle exploit in DECRYPT mode')
         cipher = AES.new(key, AES.MODE_CBC, iv)
 
-        data = pkcs7_pad(teststring, blklen=AES.block_size)
+        data = pad(teststring, AES.block_size)
         ctext = cipher.encrypt(data)
 
         print(f'Key:        {key}')
