@@ -67,7 +67,7 @@ if __name__ == '__main__':
     print(f'Decrypted somecookie: {sys.argv[1]} => {cookie}')
 ```
 
-See other example of solving CTF challenge (Pragyan CTF 2022: Kinda AESthetic) [here](https://github.com/zakigeyan/python3-paddingoracle/blob/master/example/solve.py).
+See other example of solving CTF challenge from Pragyan CTF 2022 [here](https://github.com/zakigeyan/python3-paddingoracle/blob/master/example/solve.py).
 
 ## Credits
 
